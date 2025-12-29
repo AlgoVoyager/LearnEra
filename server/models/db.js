@@ -1,20 +1,15 @@
 import {Schema, mongoose} from "mongoose";
-import {ObjectId} from mongoose.Types
-import 'dotenv/config'
 
-mongoose.connect(process.env.mongoDBuri).then(()=>{
-    console.log("Connected to MongoDB")
-})
 const userSchema = Schema({
-    firstName:{ type: String, unique: true},
+    firstName: String,
     lastName: String,
-    email: String,
+    email: { type: String, unique: true},
     password: String,
 })
 const adminSchema = Schema({
-    firstName:{ type: String, unique: true},
+    firstName:String,
     lastName: String,
-    email: String,
+    email: { type: String, unique: true},
     password: String,
 })
 const courseSchema = Schema({
@@ -22,18 +17,18 @@ const courseSchema = Schema({
     descripion: String,
     price: Number,
     imgUrl: String,
-    creatorId: ObjectId
+    creatorId: mongoose.Types.ObjectId
 })
 const purchaseSchema = Schema({
-    userId:ObjectId,
-    creatorId: ObjectId
+    userId:mongoose.Types.ObjectId,
+    creatorId: mongoose.Types.ObjectId
 })
 
 
-const userModel = mongoose.Model("user",userSchema)
-const adminModel = mongoose.Model("user",adminSchema)
-const coursesModel = mongoose.Model("user",courseSchema)
-const purchaseModel = mongoose.Model("user",purchaseSchema)
+const userModel = mongoose.model("user",userSchema)
+const adminModel = mongoose.model("admin",adminSchema)
+const coursesModel = mongoose.model("courses",courseSchema)
+const purchaseModel = mongoose.model("purchase",purchaseSchema)
 
 export {
     userModel,
