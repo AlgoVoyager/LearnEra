@@ -5,6 +5,7 @@ import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { userModel } from "../models/db.js";
 import 'dotenv/config'
+import userMiddleware from "../middlewares/user.js"
 
 
 userRouter.post('/signup', async (req, res) => {
@@ -71,8 +72,8 @@ userRouter.post('/signin', async (req, res) => {
         if(!matchPassword)
             return res.status(401).json({message:"Incorrect Password!"});
         const token = jwt.sign({
-            email
-        },process.env.jwtSecret)
+            _id:user._id
+        },process.env.JWT_USER_SECRET)
         return res.json({
             message:"Signin Succesfull!",
             token
