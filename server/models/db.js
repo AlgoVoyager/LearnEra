@@ -21,7 +21,7 @@ const courseSchema = Schema({
 })
 const purchaseSchema = Schema({
     userId:mongoose.Types.ObjectId,
-    creatorId: mongoose.Types.ObjectId
+    courseId: mongoose.Types.ObjectId
 })
 
 
