@@ -12,7 +12,7 @@ userRouter.post('/signup', async (req, res) => {
     const signupSchema = z.object({
         firstName: z.string().min(3).max(20),
         lastName: z.string().min(3).max(20),
-        email: z.string().email(),
+        email: z.email(),
         password: z.string().min(6).refine((p) => /[A-Z]/.test(p) && /[a-z]/.test(p) && /[0-9]/.test(p) && /[^A-Za-z0-9]/.test(p), {
             message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
         })
@@ -51,7 +51,7 @@ userRouter.post('/signup', async (req, res) => {
 })
 userRouter.post('/signin', async (req, res) => {
     const signinSchema = z.object({
-        email: z.string().email(),
+        email: z.email(),
         password: z.string().min(6).refine((p) => /[A-Z]/.test(p) && /[a-z]/.test(p) && /[0-9]/.test(p) && /[^A-Za-z0-9]/.test(p), {
             message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
         })

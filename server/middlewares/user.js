@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken"
-import "dotenv/config"
 export default function userMiddleware(req, res, next){
     try{
         const token = req.headers.token;

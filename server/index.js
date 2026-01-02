@@ -4,6 +4,7 @@ import userRouter from './routes/users.js'
 import adminRouter from './routes/admin.js'
 import courseRouter from './routes/courses.js'
 import mongoose from "mongoose";
+
 const app = express()
 
 app.use(express.json())

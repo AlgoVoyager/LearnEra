@@ -4,7 +4,6 @@ import z from "zod";
 import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { adminModel, coursesModel } from "../models/db.js";
-import 'dotenv/config'
 import adminMiddleware from "../middlewares/admin.js"
 
 adminRouter.post('/signup', async (req, res) => {
@@ -101,7 +100,7 @@ adminRouter.post('/course', adminMiddleware, async (req, res) => {
     const { title, descripion, price, imgUrl } = parsedBody.data;
     try{
 
-        const adminId = req._id;
+        const adminId = req.admin._id;
         const course = await coursesModel.create({
             title, descripion, price, imgUrl, creatorId:adminId
         })
@@ -116,18 +115,81 @@ adminRouter.post('/course', adminMiddleware, async (req, res) => {
 
     
 })
-adminRouter.put('/course', async (req, res) => {
-    res.json({
-        message: ""
+adminRouter.put('/course', adminMiddleware, async (req, res) => {
+    const courseSchema = z.object({
+        title: z.string().min(5).max(50),
+        descripion: z.string(),
+        price: z.number(),
+        imgUrl: z.string(),
+        courseId: z.string(),
     })
+    const parsedBody = courseSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+        const errorCause = JSON.parse(parsedBody.error.message)[0]
+        return res.status(400).json({
+            message:`${errorCause.path[0]} - ${errorCause.message}`
+        })
+    }
+    const { title, descripion, price, imgUrl, courseId } = parsedBody.data;
+    try {
+        const adminId = req.admin._id;
+        const result = await coursesModel.updateOne({
+            _id: courseId,
+            creatorId: adminId
+        }, {
+            title, descripion, price, imgUrl
+        });
+
+        if (result.matchedCount === 0) {
+            return res.status(403).json({
+                message: "Course not found or you do not have permission to edit it"
+            });
+        }
+
+        res.json({
+            message: "Course updated",
+            courseId
+        });
+
+        
+    } catch (error) {
+        console.log(error)
+        res.status(501).json({
+            message:"Internal Server Error"
+        })
+    }
 })
-adminRouter.delete('/course', async (req, res) => {
-    res.json({
-        message: ""
-    })
+adminRouter.delete('/course', adminMiddleware, async (req, res) => {
+    try {
+        const adminId = req.admin._id;
+        const { courseId } = req.body;
+        const result = await coursesModel.deleteOne({
+            _id: courseId,
+            creatorId: adminId
+        });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({
+                message: "Course not found"
+            });
+        }
+
+        res.json({
+            message: "Course deleted"
+        });
+
+    } catch (error) {
+        res.status(501).json({
+            message: "Internal server error"
+        })   
+    }
 })
 adminRouter.get('/course/bulk',adminMiddleware, async (req, res) => {
-    const courses = await coursesModel.find({})
+    const adminId = req.admin._id;
+
+    const courses = await coursesModel.find({
+        creatorId:adminId
+    })
     res.json({
         message: "courses fetch succesfull",
         courses
