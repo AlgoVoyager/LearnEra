@@ -5,7 +5,7 @@ import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { userModel } from "../models/db.js";
 import 'dotenv/config'
-import userMiddleware from "../middlewares/user.js"
+import {userMiddleware,authicateUser} from "../middlewares/user.js"
 
 
 userRouter.post('/signup', async (req, res) => {
@@ -85,10 +85,20 @@ userRouter.post('/signin', async (req, res) => {
         })
     }
 })
-userRouter.get('/purchases', async (req, res) => {
-    res.json({
-        message: ""
-    })
+userRouter.get('/me',authicateUser, async (req, res) => {    
+    try{
+        const user = await userModel.findOne({
+            _id:req.user
+        })
+        const {password, ...userDetails}= user._doc
+        res.json({
+            message: "user details found",
+            userDetails
+        })
+    }catch(error){
+        res.status(409).status({message:"server error"})
+
+    }
 })
 
 export default userRouter;

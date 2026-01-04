@@ -1,18 +1,22 @@
 import { Router } from "express";
 const courseRouter = Router();
 import {coursesModel, purchaseModel} from "../models/db.js"
-import userMiddleware from "../middlewares/user.js"
+import {userMiddleware,authicateUser} from "../middlewares/user.js"
 
-courseRouter.get('/purchases',userMiddleware, async (req, res) => {
+courseRouter.get('/purchases',authicateUser, async (req, res) => {
     try {
         const purchases = await purchaseModel.find({
             userId:req.user
         })
         const courseIds = purchases.map(purchase => purchase.courseId);
 
-        const courses = await coursesModel.find({
+        let courses = await coursesModel.find({
             _id: { $in: courseIds }
         });
+        courses = courses.map(obj => {
+            const details = obj._doc
+            return { ...details, ['userId']: req.user._id };
+        })
         res.json({
             purchases:courses
         })
@@ -23,7 +27,7 @@ courseRouter.get('/purchases',userMiddleware, async (req, res) => {
         })
     }
 })
-courseRouter.post('/purchase',userMiddleware, async (req, res) => {
+courseRouter.post('/purchase',authicateUser, async (req, res) => {
     try {
         const { courseId } = req.body;
         const course = await coursesModel.findOne({_id:courseId})
@@ -48,9 +52,26 @@ courseRouter.post('/purchase',userMiddleware, async (req, res) => {
     }
 })
 
-courseRouter.get('/courses', async (req, res) => {
-    try{
-        const courses = await coursesModel.find()
+courseRouter.get('/courses',userMiddleware, async (req, res) => {
+     try{
+        let courses = await coursesModel.find({});
+
+        // If the user is logged in (req.user exists), check for purchases
+        if (req.user) {
+            const purchases = await purchaseModel.find({
+                userId: req.user
+            });
+            const purchasedCourseIds = new Set(purchases.map(p => p.courseId.toString()));
+
+            courses = courses.map(course => {
+                const courseObj = course.toObject(); // Convert Mongoose document to plain object
+                if (purchasedCourseIds.has(courseObj._id.toString())) {
+                    courseObj.userId = req.user._id;
+                }
+                return courseObj;
+            });
+        }
+
 
         res.json({
             message: "Courses Fetched Succesfully",
