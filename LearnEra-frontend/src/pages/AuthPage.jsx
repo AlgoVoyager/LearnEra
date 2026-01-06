@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useContext } from 'react';
+import { UserContext } from '../context/userContext';
 const AuthPage = () => {
     const navigate = useNavigate();
+    const {fetchUser} = useContext(UserContext)
     const [role, setRole] = useState('user');
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
@@ -31,6 +34,7 @@ const AuthPage = () => {
             console.log(response.data)
             toast.success(response.data.message)
             localStorage.setItem('token',response.data.token)
+            await fetchUser()
             resetForm()
             navigate('/')
 
@@ -49,18 +53,6 @@ const AuthPage = () => {
         
     }
 
-    const showToastMessage = () => {
-        toast.success('Success Notification!', {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-        });
-    }
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen w-full bg-gray-50">

@@ -2,12 +2,10 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom"
 import { AuthPage, AdminPage, Homepage, ProfilePage, CoursesPage, Navbar, Footer } from "./manifest.js"
 import {UserContextProvider} from './context/userContext.jsx'
-import { CourseContextProvider } from './context/coursesContext.jsx'
 const App = () => {
   return (
     <BrowserRouter>
         <UserContextProvider>
-          <CourseContextProvider>
             <Routes>
                 <Route path="/" element={<PageLayout />}>
                   <Route index element={<Homepage />} />
@@ -17,7 +15,6 @@ const App = () => {
                   <Route path='admin' element={<AdminPage />} />
                 </Route>
             </Routes>
-          </CourseContextProvider>
         </UserContextProvider>
     </BrowserRouter>
   );

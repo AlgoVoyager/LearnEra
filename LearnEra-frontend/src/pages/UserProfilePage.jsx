@@ -10,8 +10,11 @@ import useCourse from '../utils/useCourse';
 
 
 const ProfilePage = () => {
-  const {user, loadingUser} = useContext(UserContext);
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  if(!token) navigate('/auth')
+
+  const {user, loadingUser} = useContext(UserContext);
   const { purchasedCourses} = useCourse();
   
   return (

@@ -1,13 +1,11 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import axios from "axios";
 const useCourse = () => {
     const [courses, setCourses] = useState([]);
     const [purchasedCourses, setpurchasedCourses] = useState([])
     const [loadingCourses, setloadingCourses] = useState(false)
     const token = localStorage.getItem("token");
-
-    useEffect(() => {
-        const fetchCourses = async () => {
+    const fetchCourses = useCallback(async () => {
             setloadingCourses(true)
             const response = await axios.get("v1/course/courses",{
                 headers: {
@@ -16,8 +14,8 @@ const useCourse = () => {
             });
             setCourses(response.data.courses);
             setloadingCourses(false)
-        };
-        const fetchPurchasedCourses = async () => {
+        })
+    const fetchPurchasedCourses = useCallback( async () => {
             setloadingCourses(true)
             const response = await axios.get("v1/course/purchases",{
                 headers: {
@@ -26,7 +24,8 @@ const useCourse = () => {
             });
             setpurchasedCourses(response.data.purchases);
             setloadingCourses(false)
-        };
+        })
+    useEffect(() => {
         fetchCourses();
         fetchPurchasedCourses();
     }, []);

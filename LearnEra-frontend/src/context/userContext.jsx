@@ -3,12 +3,15 @@ import axios from 'axios';
 const UserContext = createContext();
 
 const UserContextProvider = ({children}) => {
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState(undefined);
     const [loadingUser, setLoadingUser] = useState(true);
     const [errorUser, setErrorUser] = useState(null);
-    const token = localStorage.getItem("token");
-    
+    const handleLogout = () =>{
+      localStorage.removeItem("token");
+      setUser(undefined);
+    }
     const fetchUser = async () => {
+      const token = localStorage.getItem("token");
         if (token) {
           try {
             setLoadingUser(true)
@@ -34,7 +37,7 @@ const UserContextProvider = ({children}) => {
     },[])
   return (
     <>
-        <UserContext.Provider value={{user, setUser, loadingUser, errorUser}}>
+        <UserContext.Provider value={{user, setUser, loadingUser, errorUser,fetchUser, handleLogout}}>
             {children}
         </UserContext.Provider>
     </>
